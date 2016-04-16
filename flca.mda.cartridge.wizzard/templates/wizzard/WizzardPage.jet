@@ -1,0 +1,97 @@
+<%@ jet package="frontend.wizzard"  
+imports="java.util.* java.lang.reflect.* java.lang.annotation.* flca.mda.api.util.*  mda.type.* mda.annotation.wizzard.* wizzard.* "
+class="WizzardPage" %>
+<%@ include file="jetarg.jetinc" %>
+<% TypeUtils tu = new TypeUtils();%>
+<% NameUtils nu = new NameUtils();%>
+<% Object element = arg.getElement(); %>
+<% String classname = nu.getCurrentClassname();%>
+<% String pck = nu.getCurrentPackage();%>
+<% IWizzardPage wizpage = (IWizzardPage) element; %>
+
+package <%=pck%>;
+ 
+<% ImportUtils impu = new ImportUtils();%>
+<% impu.addImport("org.eclipse.jface.wizard.WizardPage");%>
+<% impu.addImport("org.eclipse.swt.SWT");%>
+<% impu.addImport("org.eclipse.swt.widgets.Listener");%>
+<% impu.addImport("org.eclipse.swt.widgets.Text");%>
+<% impu.addImport("org.eclipse.swt.widgets.Event");%>
+<% impu.addImport("org.eclipse.swt.widgets.Label");%>
+<% impu.addImport("org.eclipse.swt.widgets.Composite");%>
+<% impu.addImport("org.eclipse.swt.layout.GridData");%>
+<% impu.addImport("org.eclipse.swt.layout.GridLayout");%>
+<%
+ StringBuffer importStringBuffer = stringBuffer;
+ int importInsertionPoint = stringBuffer.length();
+ impu.addCompilationUnitImports(stringBuffer.toString());
+%>
+	
+class <%=classname%> extends WizardPage {
+<% for (Fw fw : tu.getAllFields(element.getClass())) { %>
+<% String fldname = nu.uncapName(fw); %>
+	private Text <%=fldname%>;
+<% } //for loop %>
+
+
+	public <%=classname%>() {
+		super("<%=wizpage.getName()%>");
+		setTitle("<%=wizpage.getTitle()%>");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets
+	 * .Composite)
+	 */
+	public void createControl(Composite parent) {
+		Composite composite = new Composite(parent, SWT.NULL);
+		composite.setLayout(new GridLayout(2, false));
+
+<% for (Fw fw : tu.getAllFields(element.getClass())) { %>
+<% String fldname = nu.uncapName(fw); %>
+<% String listener = nu.capName(fw) + "Listener"; %>
+<% PageField anno = (PageField) tu.getAnnotation(fw, PageField.class); %>
+<% String prompt = anno != null ? anno.label() : fldname; %>
+		new Label(composite, SWT.NULL).setText("<%=prompt%>: ");
+		<%=fldname%> = new Text(composite, SWT.SINGLE | SWT.BORDER);
+		<%=fldname%>.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		<%=fldname%>.addListener(SWT.Modify, new <%=listener%>());
+		
+<% } //for loop %>
+
+		if (getDialogSettings() != null && validDialogSettings()) {
+			//TODO populate	
+		}
+
+		setControl(composite);
+	}
+
+	private boolean validDialogSettings() {
+		//TODO
+		return true;
+	}
+	
+	@Override
+	public boolean canFlipToNextPage() {
+		//TODO 
+		return true;
+	}
+
+	//--- Listener on input fields
+<% for (Fw fw : tu.getAllFields(element.getClass())) { %>
+<% String fldname = nu.uncapName(fw); %>
+<% String listener = nu.capName(fw) + "Listener"; %>
+	class <%=listener%> implements Listener {
+		public void handleEvent(Event event) {
+			//TODO 
+		}
+	};	
+	
+<% } //for loop %>
+		
+}
+ 
+<% importStringBuffer.insert(importInsertionPoint,  impu.computeSortedImports());%>

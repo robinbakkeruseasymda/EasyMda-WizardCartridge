@@ -1,0 +1,65 @@
+<%@ jet package="frontend.wizzard"  
+imports="java.util.* java.lang.reflect.* flca.mda.api.util.*  flca.mda.api.util.*  wizzard.* "
+class="WizzardMain" %>
+<%@ include file="jetarg.jetinc" %>
+<% NameUtils nu = new NameUtils();%>
+<% Object element = arg.getElement(); %>
+<% String classname = nu.getCurrentClassname();%>
+<% TemplateUtils tplu = new TemplateUtils();%>
+<% String pck = nu.getCurrentPackage();%>
+
+package <%=pck%>;
+ 
+<% ImportUtils impu = new ImportUtils();%>
+<%String wizzardDlg = tplu.getClassName(TidWizzard.WIZZARD_DIALOG.name());%>
+<% impu.addImport("org.eclipse.jface.window.ApplicationWindow");%>
+<% impu.addImport("org.eclipse.jface.wizard.WizardDialog");%>
+<% impu.addImport("org.eclipse.jface.dialogs.Dialog");%>
+<% impu.addImport("org.eclipse.swt.SWT");%>
+<% impu.addImport("org.eclipse.swt.widgets.Button");%>
+<% impu.addImport("org.eclipse.swt.widgets.Composite");%>
+<% impu.addImport("org.eclipse.swt.widgets.Control");%>
+<% impu.addImport("org.eclipse.swt.widgets.Event");%>
+<% impu.addImport("org.eclipse.swt.widgets.Listener");%>
+<% impu.addImport("org.eclipse.swt.widgets.Shell");%>
+<%
+ StringBuffer importStringBuffer = stringBuffer;
+ int importInsertionPoint = stringBuffer.length();
+ impu.addCompilationUnitImports(stringBuffer.toString());
+%>
+	
+public class <%=classname%> extends ApplicationWindow
+{
+	/**
+	 * @param parentShell
+	 */
+	public <%=classname%>(Shell parentShell) {
+		super(parentShell);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.window.Window#createContents(org.eclipse.swt.widgets.Composite)
+	 */
+	protected Control createContents(Composite parent) {
+		Button button = new Button(parent, SWT.PUSH);
+		button.setText("Test Wizzard");
+		button.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				<%=wizzardDlg%> wizard = new <%=wizzardDlg%>();
+
+				WizardDialog dialog = new WizardDialog(getShell(), wizard);
+				dialog.setBlockOnOpen(true);
+				int returnCode = dialog.open();
+				if (returnCode == Dialog.OK)
+					System.out.println("Ok");
+				else
+					System.out.println("Cancelled");
+			}
+		});
+		return button;
+	}
+}
+ 
+<% importStringBuffer.insert(importInsertionPoint,  impu.computeSortedImports());%>

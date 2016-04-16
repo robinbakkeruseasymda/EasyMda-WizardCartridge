@@ -1,0 +1,30 @@
+<%@ jet package="frontend.wizzard"  
+imports="java.util.* java.lang.reflect.* flca.mda.api.util.*  mda.type.* wizzard.* "
+class="WizzardTest" %>
+<%@ include file="jetarg.jetinc" %>
+<% TypeUtils tu = new TypeUtils();%>
+<% NameUtils nu = new NameUtils();%>
+<% String classname = nu.getCurrentClassname();%>
+<% String pck = nu.getCurrentPackage();%>
+<% TemplateUtils tplu = new TemplateUtils();%>
+
+package <%=pck%>;
+<% ImportUtils impu = new ImportUtils();%>
+<%
+ StringBuffer importStringBuffer = stringBuffer;
+ int importInsertionPoint = stringBuffer.length();
+ impu.addCompilationUnitImports(stringBuffer.toString());
+%>
+<%String wizzard = tplu.getClassName(TidWizzard.WIZZARD_MAIN.name());%>
+<% impu.addImport("org.junit.Test");%>
+	 
+public class <%=classname%> 
+{
+	@Test
+	public void testWizzard() {
+		<%=wizzard%> wizzard = new <%=wizzard%>(null);
+		wizzard.setBlockOnOpen(true);
+		wizzard.open();
+	}
+}
+<% importStringBuffer.insert(importInsertionPoint,  impu.computeSortedImports());%>
